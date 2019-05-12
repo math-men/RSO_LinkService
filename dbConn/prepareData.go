@@ -93,6 +93,32 @@ func insertData(svc *dynamodb.DynamoDB) {
 	fmt.Printf("We have processed %v records\n", len(links))
 }
 
+func queryData(svc *dynamodb.DynamoDB) {
+	params := &dynamodb.ScanInput{
+		TableName: aws.String("Links"),
+	}
+	result, err := svc.Scan(params)
+	if err != nil {
+		fmt.Println("Failed to query")
+		return
+	}
+
+	links := []Link{}
+
+	// Unmarshal the Items field in the result value to the Item Go type.
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &links)
+	if err != nil {
+		fmt.Println("Failed to unmarshall query")
+		return
+	}
+
+	// Print out the items returned
+	fmt.Println("Query results:")
+	for _, link := range links {
+		fmt.Println(link)
+	}
+}
+
 func main() {
 	fmt.Println("Starting configuration of data model")
 	config := &aws.Config{
@@ -106,5 +132,6 @@ func main() {
 
 	createTable(svc)
 	insertData(svc)
+	queryData(svc)
 
 }
