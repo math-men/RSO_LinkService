@@ -1,0 +1,8 @@
+version: '2.1'
+services:
+  db:
+    image: amazon/dynamodb-local
+    ports:
+     - "8000:8000"
+    expose:
+     - '8000'
