@@ -3,6 +3,7 @@ package link
 import (
 	"fmt"
 	"context"
+	"errors"
 	"github.com/aws/aws-sdk-go/aws"
   "github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -43,6 +44,41 @@ func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (int64, e
   fmt.Println("Successful insert")
 
   return 123,nil
+}
+
+func (d *dynamodbLinkRepo) GetById(ctx context.Context, original string, owner string) (*models.Link, error) {
+
+	params := &dynamodb.GetItemInput{
+	    TableName: aws.String("Links"),
+	    Key: map[string]*dynamodb.AttributeValue{
+	        "original": {
+	            S: aws.String(original),
+	        },
+					"owner": {
+	            S: aws.String(owner),
+	        },
+	    },
+	}
+
+	result, err := d.Conn.GetItem(params)
+	if err != nil {
+			fmt.Println(err.Error())
+			return nil, err
+	}
+	link := &models.Link{}
+
+	err = dynamodbattribute.UnmarshalMap(result.Item, &link)
+	if err != nil {
+			fmt.Println(err.Error())
+			return nil, err
+	}
+
+	if link.Owner == "" {
+		return nil, errors.New("No such link")
+	}
+
+	return link, nil
+
 }
 
 func (d *dynamodbLinkRepo) Fetch(ctx context.Context) ([]*models.Link, error) {

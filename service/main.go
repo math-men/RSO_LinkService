@@ -41,6 +41,7 @@ func linkRouter(lHandler *lh.Link) http.Handler {
   r.Use(jwtauth.Authenticator)
 	r.Post("/", lHandler.Create)
   r.Get("/", lHandler.Fetch)
+  r.Get("/get/{owner:[a-zA-Z0-9]+}/{original:(.*?)}", lHandler.GetById)
 	return r
 }
 

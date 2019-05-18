@@ -44,6 +44,16 @@ func (l *Link) Fetch(w http.ResponseWriter, r *http.Request) {
 	respondwithJSON(w, http.StatusOK, payload)
 }
 
+func (l *Link) GetById(w http.ResponseWriter, r *http.Request) {
+	original := chi.URLParam(r, "original")
+	owner := chi.URLParam(r, "owner")
+	payload, err := l.repo.GetById(r.Context(), string(original), string(owner))
+  if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+	respondwithJSON(w, http.StatusOK, payload)
+}
+
 // Create a new post
 func (l *Link) Create(w http.ResponseWriter, r *http.Request) {
 	link := models.Link{}
