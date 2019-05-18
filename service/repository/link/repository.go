@@ -47,10 +47,12 @@ func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (int64, e
 
 func (d *dynamodbLinkRepo) Fetch(ctx context.Context) ([]*models.Link, error) {
 
-	params := &dynamodb.ScanInput{
+		params := &dynamodb.ScanInput{
 			TableName: aws.String("Links"),
 		}
 		result, err := d.Conn.Scan(params)
+		fmt.Println(result)
+		fmt.Println(err)
 		if err != nil {
 			fmt.Println("Failed to query")
 			return nil, err

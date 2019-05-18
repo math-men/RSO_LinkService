@@ -1,14 +1,22 @@
 package handler
 
 import (
+	"os"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"../../driver"
+	"strconv"
+	"github.com/go-chi/chi"
 	models "../../models"
 	repository "../../repository"
 	link "../../repository/link"
+	jwt "github.com/dgrijalva/jwt-go"
+	jwtauth "github.com/go-chi/jwtauth"
 )
+
+var mySigningKey = []byte(os.Getenv("USERS_JWT_TOKEN"))
+var TokenAuth = jwtauth.New("HS256", []byte(mySigningKey), nil)
 
 func NewLinkHandler(db *driver.DB) *Link {
 	return &Link{
@@ -21,10 +29,17 @@ type Link struct {
 	repo repository.LinkRepo
 }
 
+func (l *Link) GetToken(w http.ResponseWriter, r *http.Request) {
+		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+		_, tokenString, _ := TokenAuth.Encode(jwt.MapClaims{"link_id": id})
+		fmt.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
+    respondwithJSON(w, http.StatusOK, map[string]string{"token": tokenString})
+}
+
 func (l *Link) Fetch(w http.ResponseWriter, r *http.Request) {
 	payload, err := l.repo.Fetch(r.Context())
   if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Server Error")
+		respondWithError(w, http.StatusInternalServerError, "Server error")
 	}
 	respondwithJSON(w, http.StatusOK, payload)
 }
