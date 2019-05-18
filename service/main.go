@@ -25,12 +25,7 @@ func main() {
 
 	lHandler := lh.NewLinkHandler(connection)
   r.Group(func(r chi.Router) {
-    r.Use(jwtauth.Verifier(lh.TokenAuth))
-    r.Use(jwtauth.Authenticator)
-    r.Get("/admin", func(w http.ResponseWriter, r *http.Request) {
-      _, claims, _ := jwtauth.FromContext(r.Context())
-      w.Write([]byte(fmt.Sprintf("protected area. hi %v", claims["user_id"])))
-      })
+    r.Get("/gettoken",  lHandler.GetToken)
   })
 	r.Route("/", func(rt chi.Router) {
 		rt.Mount("/links", linkRouter(lHandler))
@@ -42,9 +37,10 @@ func main() {
 
 func linkRouter(lHandler *lh.Link) http.Handler {
 	r := chi.NewRouter()
+  r.Use(jwtauth.Verifier(lh.TokenAuth))
+  r.Use(jwtauth.Authenticator)
 	r.Post("/", lHandler.Create)
   r.Get("/", lHandler.Fetch)
-  r.Get("/Gettoken", lHandler.GetToken)
 	return r
 }
 
