@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 	"../../driver"
 	"strconv"
 	"github.com/go-chi/chi"
@@ -31,7 +32,9 @@ type Link struct {
 
 func (l *Link) GetToken(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-		_, tokenString, _ := TokenAuth.Encode(jwt.MapClaims{"link_id": id})
+		ttl := 30 * time.Second
+		expireIn := time.Now().UTC().Add(ttl).Unix()
+		_, tokenString, _ := TokenAuth.Encode(jwt.MapClaims{"link_id": id, "exp": expireIn})
 		fmt.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
     respondwithJSON(w, http.StatusOK, map[string]string{"token": tokenString})
 }
