@@ -1,23 +1,15 @@
 package handler
 
 import (
-	"os"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 	"../../driver"
-	"strconv"
 	"github.com/go-chi/chi"
 	models "../../models"
 	repository "../../repository"
 	link "../../repository/link"
-	jwt "github.com/dgrijalva/jwt-go"
-	jwtauth "github.com/go-chi/jwtauth"
 )
-
-var mySigningKey = []byte(os.Getenv("USERS_JWT_TOKEN"))
-var TokenAuth = jwtauth.New("HS256", []byte(mySigningKey), nil)
 
 func NewLinkHandler(db *driver.DB) *Link {
 	return &Link{
@@ -28,15 +20,6 @@ func NewLinkHandler(db *driver.DB) *Link {
 // Post ...
 type Link struct {
 	repo repository.LinkRepo
-}
-
-func (l *Link) GetToken(w http.ResponseWriter, r *http.Request) {
-		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-		ttl := 30 * time.Second
-		expireIn := time.Now().UTC().Add(ttl).Unix()
-		_, tokenString, _ := TokenAuth.Encode(jwt.MapClaims{"link_id": id, "exp": expireIn})
-		fmt.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
-    respondwithJSON(w, http.StatusOK, map[string]string{"token": tokenString})
 }
 
 func (l *Link) Fetch(w http.ResponseWriter, r *http.Request) {
