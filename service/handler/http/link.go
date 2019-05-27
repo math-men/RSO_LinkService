@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 	"net/http"
 	"../../driver"
 	"github.com/go-chi/chi"
@@ -30,14 +31,17 @@ func (l *Link) Fetch(w http.ResponseWriter, r *http.Request) {
 	respondwithJSON(w, http.StatusOK, payload)
 }
 
-func (l *Link) GetById(w http.ResponseWriter, r *http.Request) {
-	original := chi.URLParam(r, "original")
-	owner := chi.URLParam(r, "owner")
-	payload, err := l.repo.GetById(r.Context(), string(original), string(owner))
+func (l *Link) Get(w http.ResponseWriter, r *http.Request) {
+	shortened := chi.URLParam(r, "shortened")
+	payload, err := l.repo.Get(r.Context(), string(shortened))
   if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
+	} else {
+		respondwithJSON(w, http.StatusOK, payload)
+		click := models.Click{payload[0].Processed, time.Now().String(), payload[0].Owner}
+		err := l.repo.RegisterClick(r.Context(), &click)
+		fmt.Println(err)
 	}
-	respondwithJSON(w, http.StatusOK, payload)
 }
 
 // Create a new post
@@ -49,9 +53,19 @@ func (l *Link) Create(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(newID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Server Error")
+	} else {
+		respondwithJSON(w, http.StatusCreated, map[string]string{"message": "Successfully Created"})
 	}
+}
 
-	respondwithJSON(w, http.StatusCreated, map[string]string{"message": "Successfully Created"})
+func (l *Link) GetClicks(w http.ResponseWriter, r *http.Request) {
+	owner := chi.URLParam(r, "owner")
+	payload, err := l.repo.GetClicks(r.Context(), string(owner))
+  if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	} else {
+		respondwithJSON(w, http.StatusOK, payload)
+	}
 }
 
 func respondwithJSON(w http.ResponseWriter, code int, payload interface{}) {

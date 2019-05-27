@@ -4,5 +4,5 @@ type Link struct {
 	Owner     string      `json:"owner"`
 	Original  string      `json:"original"`
 	Processed string			`json:"processed"`
-	Cost      int			    `json:"cost"`
+	TTL 			int64				`json:"ttl"`
 }

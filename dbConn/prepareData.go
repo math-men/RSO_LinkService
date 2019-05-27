@@ -17,7 +17,7 @@ type Link struct {
 	Cost      int			    `json:"cost"`
 }
 
-func createTable(svc *dynamodb.DynamoDB) {
+func createTableLinks(svc *dynamodb.DynamoDB) {
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
@@ -25,17 +25,17 @@ func createTable(svc *dynamodb.DynamoDB) {
 				AttributeType: aws.String("S"),
 			},
 			{
-				AttributeName: aws.String("original"),
+				AttributeName: aws.String("processed"),
 				AttributeType: aws.String("S"),
 			},
 		},
 		KeySchema: []*dynamodb.KeySchemaElement{
 			{
-				AttributeName: aws.String("owner"),
+				AttributeName: aws.String("processed"),
 				KeyType:       aws.String("HASH"),
 			},
 			{
-				AttributeName: aws.String("original"),
+				AttributeName: aws.String("owner"),
 				KeyType:       aws.String("RANGE"),
 			},
 		},
@@ -46,6 +46,42 @@ func createTable(svc *dynamodb.DynamoDB) {
 		TableName: aws.String("Links"),
 	}
 
+	createTable(svc, input)
+}
+
+func createTableClicks(svc *dynamodb.DynamoDB) {
+	input := &dynamodb.CreateTableInput{
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("owner"),
+				AttributeType: aws.String("S"),
+			},
+			{
+				AttributeName: aws.String("timestamp"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("owner"),
+				KeyType:       aws.String("HASH"),
+			},
+			{
+				AttributeName: aws.String("timestamp"),
+				KeyType:       aws.String("RANGE"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+		TableName: aws.String("Clicks"),
+	}
+
+	createTable(svc, input)
+}
+
+func createTable(svc *dynamodb.DynamoDB, input *dynamodb.CreateTableInput) {
 	result, err := svc.CreateTable(input)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -130,7 +166,8 @@ func main() {
 
 	svc := dynamodb.New(sess)
 
-	createTable(svc)
+	createTableLinks(svc)
+	createTableClicks(svc)
 	insertData(svc)
 	queryData(svc)
 
