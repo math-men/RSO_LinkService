@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"context"
 	"errors"
+	"math/rand"
 	"github.com/aws/aws-sdk-go/aws"
   "github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	models "../../models"
 	lRepo "../../repository"
 )
+
+BASE_URL := "sshort.me/"
 
 func NewDynamoLinkRepo(Conn *dynamodb.DynamoDB) lRepo.LinkRepo {
 	return &dynamodbLinkRepo{
@@ -23,8 +26,7 @@ type dynamodbLinkRepo struct {
 
 
 func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (int64, error) {
-
-
+  l.Processed = BASE_URL + helperRandomLink()
   info, err := dynamodbattribute.MarshalMap(l)
   if err != nil {
     panic(fmt.Sprintf("failed to marshal the link, %v", err))
@@ -38,12 +40,12 @@ func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (int64, e
   _, err = d.Conn.PutItem(input)
   if err != nil {
     fmt.Println(err.Error())
-    return 1,nil
+    return 1, err.Error()
   }
 
   fmt.Println("Successful insert")
 
-  return 123,nil
+  return 0, nil
 }
 
 func (d *dynamodbLinkRepo) GetById(ctx context.Context, original string, owner string) (*models.Link, error) {
@@ -110,4 +112,14 @@ func (d *dynamodbLinkRepo) Fetch(ctx context.Context) ([]*models.Link, error) {
 	}
 
 	return links, nil
+}
+
+func helperRandomLink() string {
+	 len := 9
+   bytes := make([]byte, len)
+   for i := 0; i < len; i++ {
+   	   bytes[i] = byte(65 + rand.Intn(25))  //A=65 and Z = 65+25
+   }
+   return string(bytes)
+
 }
