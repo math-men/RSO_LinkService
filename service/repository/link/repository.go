@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"context"
 	"math/rand"
-	"errors"
+	"time"
 	"github.com/aws/aws-sdk-go/aws"
   "github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -76,7 +76,7 @@ func (d *dynamodbLinkRepo) Get(ctx context.Context, shortened string) ([]*models
 		return nil, err
 	}
 	if len(links) == 0{
-		return nil, errors.New("No such link")
+		return nil, models.ErrNotFound
 	}
 	for _, link := range links {
 		link.Processed = BASE_URL + link.Processed

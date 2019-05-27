@@ -35,8 +35,8 @@ func linkRouter(lHandler *lh.Link) http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", lHandler.Create)
   r.Get("/", lHandler.Fetch)
-  r.Get("/get/{shortened:.*}", lHandler.Get)
-  r.Get("/api/get/{owner:.*}", lHandler.GetClicks)
+  r.Get("/{shortened:.*}", lHandler.Get)
+  r.Get("/api/{owner:.*}", lHandler.GetClicks)
 	return r
 }
 
