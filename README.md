@@ -26,4 +26,16 @@ go get github.com/go-chi/chi/middleware <br/>
 go build <br/>
 go run main.go <br/>
 
+Endpoints: 
 
+[GET] localhost:port/links - fetch all links ( for dev purposes )
+[POST] localhost:port/links - crreate link 
+Body: 
+	"owner": "1321231",
+	"original": "http://www.beka.com",
+	"ttl": 125
+}
+[GET] localhost:port/links/{skrot} - give me original url -> redirect ( + register click :) )
+[GET] localhost:port/api/links/{user} - give me user's links sum of clicks 
+
+  
