@@ -37,7 +37,7 @@ func (l *Link) Get(w http.ResponseWriter, r *http.Request) {
   if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	} else {
-		respondwithJSON(w, http.StatusOK, payload)
+		http.Redirect(w, r, payload[0].Original, 301)
 		click := models.Click{payload[0].Processed, time.Now().String(), payload[0].Owner}
 		err := l.repo.RegisterClick(r.Context(), &click)
 		fmt.Println(err)
