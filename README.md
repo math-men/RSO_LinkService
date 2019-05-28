@@ -9,12 +9,12 @@ cd dbConn <br/>
 
 Run service <br/>
 cd service <br/>
-EXPORT AWS_ACCESS_KEY=<sth> <br/>
-EXPORT AWS_SECRET_KEY=<sth> <br/>
+EXPORT AWS_ACCESS_KEY=dzien <br/>
+EXPORT AWS_SECRET_KEY=donry <br/>
 EXPORT AWS_REGION=us-west-2 <br/>
 
 EXPORT HOST=http://localhost: <br/>
-EXPORT PORT=<SERVER_PORT> <br/>
+EXPORT PORT=liczba <br/>
 EXPORT REGION=us-west-2 <br/>
 EXPORT DYNAMO_PORT=8000 <br/>
 
