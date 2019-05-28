@@ -28,14 +28,14 @@ go run main.go <br/>
 
 Endpoints: 
 
-[GET] localhost:port/links - fetch all links ( for dev purposes )
-[POST] localhost:port/links - crreate link 
-Body: 
-	"owner": "1321231",
-	"original": "http://www.beka.com",
-	"ttl": 125
-}
-[GET] localhost:port/links/{skrot} - give me original url -> redirect ( + register click :) )
+[GET] localhost:port/links - fetch all links ( for dev purposes ) <br/>
+[POST] localhost:port/links - crreate link <br/>
+Body: <br/>
+	"owner": "1321231", <br/>
+	"original": "http://www.beka.com", <br/>
+	"ttl": 125 <br/>
+} <br/>
+[GET] localhost:port/links/{skrot} - give me original url -> redirect ( + register click :) ) <br/>
 [GET] localhost:port/api/links/{user} - give me user's links sum of clicks 
 
   
