@@ -12,6 +12,7 @@ import (
 	link "../../repository/link"
 )
 
+
 func NewLinkHandler(db *driver.DB) *Link {
 	return &Link{
 		repo: link.NewDynamoLinkRepo(db.Dynamko),
@@ -21,6 +22,10 @@ func NewLinkHandler(db *driver.DB) *Link {
 // Post ...
 type Link struct {
 	repo repository.LinkRepo
+}
+
+func (l *Link) Health(w http.ResponseWriter, r *http.Request) {
+	respondwithJSON(w, http.StatusOK, nil)
 }
 
 func (l *Link) Fetch(w http.ResponseWriter, r *http.Request) {

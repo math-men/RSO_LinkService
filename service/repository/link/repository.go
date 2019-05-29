@@ -24,7 +24,6 @@ type dynamodbLinkRepo struct {
 	Conn *dynamodb.DynamoDB
 }
 
-
 func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (int64, error) {
   l.Processed = helperRandomLink()
 	l.TTL = int64(time.Now().Unix() + l.TTL)

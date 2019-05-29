@@ -4,6 +4,7 @@ package driver
 import (
 	"database/sql"
 	"fmt"
+	"os"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -19,9 +20,17 @@ type DB struct {
 var dbConn = &DB{}
 
 func ConnectDynamo(host, port, region string) (*DB) {
-	config := &aws.Config{
-		Region:   aws.String(region),
-		Endpoint: aws.String(host + port),
+
+	var config *aws.Config
+	if(os.Getenv("ISLOCAL") == "true") {
+		config = &aws.Config{
+			Region:   aws.String(region),
+			Endpoint: aws.String(host + port),
+		}
+	} else {
+		config = &aws.Config{
+			Region:   aws.String(region),
+		}
 	}
 
 	sess := session.Must(session.NewSession(config))
