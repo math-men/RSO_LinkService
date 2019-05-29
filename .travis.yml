@@ -4,6 +4,8 @@ services:
 script:
 # TODO: Dodać budowanie/testowanie
   - echo 'Empty build'
+before_deploy:
+  pip install --user awscli
 deploy:
   provider: script
   script: >-
