@@ -37,4 +37,4 @@ Body: <br/>
 } <br/>
 [GET] localhost:port/links/{skrot} - give me original url -> redirect ( + register click :) ) <br/>
 [GET] localhost:port/api/links/{user} - give me user's links sum of clicks <br/>
-[GET] localhost:port/links/health - healthcheck
+[GET] localhost:port/links/heath - healtheck
