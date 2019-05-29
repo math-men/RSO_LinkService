@@ -1,0 +1,17 @@
+language: minimal
+services:
+  - docker
+script:
+# TODO: Dodać budowanie/testowanie
+  - echo 'Empty build'
+deploy:
+  provider: script
+  script: >-
+    docker build -t aleksanderbrzozowski/rso-link-service ./service && 
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && 
+    docker push aleksanderbrzozowski/rso-link-service &&
+    ~/.local/bin/aws ecs update-service --cluster sshort-cluster --service link-service --region us-east-1 --force-new-deployment
+  skip_cleanup: true
+  on:
+    branch: master
+    condition: $DEPLOY = TRUE
