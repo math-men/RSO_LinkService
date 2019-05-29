@@ -5,10 +5,12 @@ ENV HOST=http://localhost:
 ENV PORT=9001
 ENV DYNAMO_PORT=8000
 ENV REGION=us-west-2
-ENV AWS_ACCESS_KEY=test
-ENV AWS_SECRET_KEY=test
-ENV AWS_REGION=us-west-2
 ENV ISLOCAL=true
+
+# set AWS ENV for local development
+# ENV AWS_ACCESS_KEY=test
+# ENV AWS_SECRET_KEY=test
+# ENV AWS_REGION=us-west-2
 
 COPY . ${SOURCES}
 WORKDIR ${SOURCES}
