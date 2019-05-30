@@ -2,9 +2,9 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 	"net/http"
+	"strings"
 	"../../driver"
 	"github.com/go-chi/chi"
 	models "../../models"
@@ -42,10 +42,17 @@ func (l *Link) Get(w http.ResponseWriter, r *http.Request) {
   if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	} else {
-		http.Redirect(w, r, payload[0].Original, 301)
 		click := models.Click{payload[0].Processed, time.Now().String(), payload[0].Owner}
 		err := l.repo.RegisterClick(r.Context(), &click)
-		fmt.Println(err)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		redirectUrl := payload[0].Original
+		if validUrl(redirectUrl) {
+			http.Redirect(w, r, redirectUrl, 301)
+		} else {
+		  respondWithError(w, http.StatusServiceUnavailable, models.CannotRedirect)
+		}
 	}
 }
 
@@ -70,6 +77,13 @@ func (l *Link) GetClicks(w http.ResponseWriter, r *http.Request) {
 	} else {
 		respondwithJSON(w, http.StatusOK, payload)
 	}
+}
+
+func validUrl(url string) bool {
+	if strings.Contains(url, "http") {
+		return true
+	}
+	return false;
 }
 
 func respondwithJSON(w http.ResponseWriter, code int, payload interface{}) {
