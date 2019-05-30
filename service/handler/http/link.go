@@ -25,13 +25,13 @@ type Link struct {
 }
 
 func (l *Link) Health(w http.ResponseWriter, r *http.Request) {
-	respondwithJSON(w, http.StatusOK, nil)
+	respondwithJSON(w, http.StatusOK, models.HealthCheck)
 }
 
 func (l *Link) Fetch(w http.ResponseWriter, r *http.Request) {
 	payload, err := l.repo.Fetch(r.Context())
   if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Server error")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 	respondwithJSON(w, http.StatusOK, payload)
 }
@@ -54,12 +54,11 @@ func (l *Link) Create(w http.ResponseWriter, r *http.Request) {
 	link := models.Link{}
 	json.NewDecoder(r.Body).Decode(&link)
 
-	newID, err := l.repo.Create(r.Context(), &link)
-	fmt.Println(newID)
+	url, err := l.repo.Create(r.Context(), &link)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Server Error")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 	} else {
-		respondwithJSON(w, http.StatusCreated, map[string]string{"message": "Successfully Created"})
+		respondwithJSON(w, http.StatusCreated, map[string]string{"message": models.SuccessfulInsert, "link": url})
 	}
 }
 

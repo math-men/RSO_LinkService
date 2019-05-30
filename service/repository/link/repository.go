@@ -12,8 +12,6 @@ import (
 	lRepo "../../repository"
 )
 
-var BASE_URL = "sshort.me/"
-
 func NewDynamoLinkRepo(Conn *dynamodb.DynamoDB) lRepo.LinkRepo {
 	return &dynamodbLinkRepo{
 		Conn: Conn,
@@ -24,12 +22,12 @@ type dynamodbLinkRepo struct {
 	Conn *dynamodb.DynamoDB
 }
 
-func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (int64, error) {
+func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (string, error) {
   l.Processed = helperRandomLink()
 	l.TTL = int64(time.Now().Unix() + l.TTL)
   info, err := dynamodbattribute.MarshalMap(l)
   if err != nil {
-    panic(fmt.Sprintf("failed to marshal the link, %v", err))
+    return "", models.ErrMarshalling
   }
 
   input := &dynamodb.PutItemInput{
@@ -39,13 +37,10 @@ func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (int64, e
 
   _, err = d.Conn.PutItem(input)
   if err != nil {
-    fmt.Println(err.Error())
-    return 1, err
+    return "", models.ErrInsert
   }
 
-  fmt.Println("Successful insert")
-
-  return 0, nil
+  return l.Processed, nil
 }
 
 func (d *dynamodbLinkRepo) Get(ctx context.Context, shortened string) ([]*models.Link, error) {
@@ -66,20 +61,19 @@ func (d *dynamodbLinkRepo) Get(ctx context.Context, shortened string) ([]*models
 
 	var result, err = d.Conn.Query(queryInput)
 	if err != nil {
-	    return nil, err
+			fmt.Println(err)
+	    return nil, models.ErrQuery
 	}
 
 	links := []*models.Link{}
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &links)
 	if err != nil {
-		return nil, err
+		return nil, models.ErrMarshalling
 	}
 	if len(links) == 0{
 		return nil, models.ErrNotFound
 	}
-	for _, link := range links {
-		link.Processed = BASE_URL + link.Processed
-	}
+
 	return links, nil
 
 }
@@ -90,11 +84,8 @@ func (d *dynamodbLinkRepo) Fetch(ctx context.Context) ([]*models.Link, error) {
 			TableName: aws.String("Links"),
 		}
 		result, err := d.Conn.Scan(params)
-		fmt.Println(result)
-		fmt.Println(err)
 		if err != nil {
-			fmt.Println("Failed to query")
-			return nil, err
+			return nil, models.ErrQuery
 		}
 
 		links := []*models.Link{}
@@ -102,24 +93,17 @@ func (d *dynamodbLinkRepo) Fetch(ctx context.Context) ([]*models.Link, error) {
 		// Unmarshal the Items field in the result value to the Item Go type.
 		err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &links)
 		if err != nil {
-			fmt.Println("Failed to unmarshall query")
-			return nil, err
+			return nil, models.ErrMarshalling
 		}
 
-		// Print out the items returned
-		fmt.Println("Query results:")
-		for _, link := range links {
-			fmt.Println(link)
-	}
-
-	return links, nil
+		return links, nil
 }
 
 func (d *dynamodbLinkRepo) RegisterClick(ctx context.Context, c *models.Click) (error) {
 
 	info, err := dynamodbattribute.MarshalMap(c)
-  if err != nil {
-    panic(fmt.Sprintf("failed to marshal the link, %v", err))
+  if err != nil { //A=65 and Z = 65+25
+    return models.ErrMarshalling
   }
 
   input := &dynamodb.PutItemInput{
@@ -129,11 +113,8 @@ func (d *dynamodbLinkRepo) RegisterClick(ctx context.Context, c *models.Click) (
 
   _, err = d.Conn.PutItem(input)
   if err != nil {
-    fmt.Println(err.Error())
-    return err
+    return models.ErrInsert
   }
-
-  fmt.Println("Successful insert")
 
   return nil
 
@@ -156,13 +137,13 @@ func (d *dynamodbLinkRepo) GetClicks(ctx context.Context, owner string) (int, er
 
 	var result, err = d.Conn.Query(queryInput)
 	if err != nil {
-	    return -1, err
+	    return -1, models.ErrQuery
 	}
 
 	links := []*models.Link{}
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &links)
 	if err != nil {
-		return -1, err
+		return -1, models.ErrMarshalling
 	}
 	return len(links), nil
 }
@@ -171,7 +152,7 @@ func helperRandomLink() string {
 	 len := 9
    bytes := make([]byte, len)
    for i := 0; i < len; i++ {
-   	   bytes[i] = byte(65 + rand.Intn(25))  //A=65 and Z = 65+25
+   	   bytes[i] = byte(65 + rand.Intn(25))
    }
    return string(bytes)
 
