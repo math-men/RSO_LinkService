@@ -5,6 +5,7 @@ import (
 	"context"
 	"math/rand"
 	"time"
+	"strings"
 	"github.com/aws/aws-sdk-go/aws"
   "github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -146,6 +147,13 @@ func (d *dynamodbLinkRepo) GetClicks(ctx context.Context, owner string) (int, er
 		return -1, models.ErrMarshalling
 	}
 	return len(links), nil
+}
+
+func validUrl(url string) bool {
+	if strings.Contains(url, "http") {
+		return true
+	}
+	return false;
 }
 
 func helperRandomLink() string {
