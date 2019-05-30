@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 language: minimal
 services:
   - docker
@@ -18,20 +17,3 @@ deploy:
   on:
     branch: master
     condition: $DEPLOY = TRUE
-=======
-services:
-  - docker
-# before_deploy:
-#   pip install --user awscli
-deploy:
-  provider: script
-  script: >-
-    docker build -t aleksanderbrzozowski/rso-frontend ./service && 
-    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && 
-    docker push aleksanderbrzozowski/rso-link-service 
-    # ~/.local/bin/aws ecs update-service --cluster sshort-cluster --service frontend --region us-east-1 --force-new-deployment
-  skip_cleanup: true
-  # on:
-  #   branch: master
-    # condition: $DEPLOY = TRUE
->>>>>>> travis ci configuration
