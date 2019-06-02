@@ -5,7 +5,6 @@ import (
 	"time"
 	"net/http"
 	"strings"
-	"fmt"
 	"../../driver"
 	"github.com/go-chi/chi"
 	models "../../models"
@@ -66,7 +65,7 @@ func (l *Link) Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	} else {
-		respondwithJSON(w, http.StatusCreated, map[string]string{"message": models.SuccessfulInsert, "link": url})
+		respondwithJSON(w, http.StatusCreated, map[string]string{"url": link.Original, "shortenedUrl": url})
 	}
 }
 
@@ -76,7 +75,6 @@ func (l *Link) GetClicks(w http.ResponseWriter, r *http.Request) {
   if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	} else {
-		fmt.Println(linkResponse(clicks))
 		lol := linkResponse(clicks)
 		respondwithJSON(w, http.StatusOK, lol)
 	}

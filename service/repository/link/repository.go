@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/rand"
 	"time"
+	"fmt"
 	"strings"
 	"github.com/aws/aws-sdk-go/aws"
   "github.com/aws/aws-sdk-go/service/dynamodb"
@@ -81,9 +82,11 @@ func (d *dynamodbLinkRepo) Fetch(ctx context.Context) ([]*models.Link, error) {
 		params := &dynamodb.ScanInput{
 			TableName: aws.String("Links"),
 		}
-
+		fmt.Println("123")
 		result, err := d.Conn.Scan(params)
 		if err != nil {
+			fmt.Println(err)
+
 			return nil, models.ErrQuery
 		}
 
