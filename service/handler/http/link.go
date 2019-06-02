@@ -5,6 +5,7 @@ import (
 	"time"
 	"net/http"
 	"strings"
+	"fmt"
 	"../../driver"
 	"github.com/go-chi/chi"
 	models "../../models"
@@ -42,7 +43,7 @@ func (l *Link) Get(w http.ResponseWriter, r *http.Request) {
   if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	} else {
-		click := models.Click{payload[0].Processed, time.Now().String(), payload[0].Owner}
+		click := models.Click{payload[0].Processed, time.Now().String()}
 		err := l.repo.RegisterClick(r.Context(), &click)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -70,12 +71,14 @@ func (l *Link) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Link) GetClicks(w http.ResponseWriter, r *http.Request) {
-	owner := chi.URLParam(r, "owner")
-	payload, err := l.repo.GetClicks(r.Context(), string(owner))
+	shortened := chi.URLParam(r, "shortened")
+	clicks, err := l.repo.GetClicks(r.Context(), string(shortened))
   if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	} else {
-		respondwithJSON(w, http.StatusOK, payload)
+		fmt.Println(linkResponse(clicks))
+		lol := linkResponse(clicks)
+		respondwithJSON(w, http.StatusOK, lol)
 	}
 }
 
@@ -84,6 +87,12 @@ func validUrl(url string) bool {
 		return true
 	}
 	return false;
+}
+
+func linkResponse(clicks int) map[string]int {
+	response := make(map[string]int)
+	response["clicks"] = clicks
+	return response
 }
 
 func respondwithJSON(w http.ResponseWriter, code int, payload interface{}) {

@@ -36,7 +36,6 @@ func ConnectDynamo(host, port, region string) (*DB) {
 	sess := session.Must(session.NewSession(config))
 
 	svc := dynamodb.New(sess)
-
 	dbConn.Dynamko = svc
 	return dbConn
 }

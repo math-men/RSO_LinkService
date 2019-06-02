@@ -38,8 +38,11 @@ func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (string, 
 
   _, err = d.Conn.PutItem(input)
   if err != nil {
+		fmt.Println(err)
+
     return "", models.ErrInsert
   }
+
 
   return l.Processed, nil
 }
@@ -59,7 +62,6 @@ func (d *dynamodbLinkRepo) Get(ctx context.Context, shortened string) ([]*models
 	        },
 	    },
 	}
-
 	var result, err = d.Conn.Query(queryInput)
 	if err != nil {
 			fmt.Println(err)
@@ -84,8 +86,11 @@ func (d *dynamodbLinkRepo) Fetch(ctx context.Context) ([]*models.Link, error) {
 		params := &dynamodb.ScanInput{
 			TableName: aws.String("Links"),
 		}
+		fmt.Println("query")
+
 		result, err := d.Conn.Scan(params)
 		if err != nil {
+			fmt.Println(err)
 			return nil, models.ErrQuery
 		}
 
@@ -121,15 +126,15 @@ func (d *dynamodbLinkRepo) RegisterClick(ctx context.Context, c *models.Click) (
 
 }
 
-func (d *dynamodbLinkRepo) GetClicks(ctx context.Context, owner string) (int, error) {
+func (d *dynamodbLinkRepo) GetClicks(ctx context.Context, shortened string) (int, error) {
 	var queryInput = &dynamodb.QueryInput{
 	    TableName: aws.String("Clicks"),
 	    KeyConditions: map[string]*dynamodb.Condition{
-	        "owner": {
+	        "processed": {
 	            ComparisonOperator: aws.String("EQ"),
 	            AttributeValueList: []*dynamodb.AttributeValue{
 	                {
-	                    S: aws.String(owner),
+	                    S: aws.String(shortened),
 	                },
 	            },
 	        },
@@ -140,13 +145,12 @@ func (d *dynamodbLinkRepo) GetClicks(ctx context.Context, owner string) (int, er
 	if err != nil {
 	    return -1, models.ErrQuery
 	}
-
 	links := []*models.Link{}
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &links)
 	if err != nil {
 		return -1, models.ErrMarshalling
 	}
-	return len(links), nil
+ 	return len(links), nil
 }
 
 func validUrl(url string) bool {

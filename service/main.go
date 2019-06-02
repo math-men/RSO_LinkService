@@ -37,7 +37,7 @@ func linkRouter(lHandler *lh.Link) http.Handler {
 	r.Post("/", lHandler.Create)
   r.Get("/", lHandler.Fetch)
   r.Get("/{shortened:.*}", lHandler.Get)
-  r.Get("/api/{owner:.*}", lHandler.GetClicks)
+  r.Get("/api/{shortened:.*}", lHandler.GetClicks)
 	return r
 }
 
