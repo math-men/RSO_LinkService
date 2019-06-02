@@ -28,13 +28,13 @@ go run main.go <br/>
 
 Endpoints:
 
-[GET] localhost:port/links - fetch all links ( for dev purposes ) <br/>
+[GET] localhost:port/links - fetch all links ( for dev purposes ) SUCCESS (200), ERROR (500)<br/>
 [POST] localhost:port/links - crreate link <br/>
 Body: <br/>
 	"owner": "1321231", <br/>
 	"original": "http://www.beka.com", <br/>
 	"ttl": 125 <br/>
-} <br/>
-[GET] localhost:port/links/{skrot} - give me original url -> redirect ( + register click :) ) <br/>
-[GET] localhost:port/api/links/{user} - give me user's links sum of clicks <br/>
+} SUCCESS (201), ERROR (500) <br/> 
+[GET] localhost:port/links/{skrot} - give me original url -> redirect ( + register click :) ) SUCCESS (301), ERROR (503) <br/> 
+[GET] localhost:port/api/links/{user} - give me user's links sum of clicks SUCCESS (200), ERROR (500) <br/>
 [GET] localhost:port/links/heath - healtheck
