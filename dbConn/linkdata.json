@@ -1,5 +1,5 @@
 [{
- "owner": "123456789",
  "original": "www.newyorktimes.com",
- "processed": "sshort.me/12345"
+ "processed": "sshort.me/12345",
+ "ttl": 123123123
 }]

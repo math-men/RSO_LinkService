@@ -11,21 +11,20 @@ import (
 )
 
 type Link struct {
-	Owner     string      `json:"owner"`
 	Original  string      `json:"original"`
 	Processed string			`json:"processed"`
-	Cost      int			    `json:"cost"`
+	Ttl      int			    `json:"ttl"`
 }
 
 func createTableLinks(svc *dynamodb.DynamoDB) {
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
-				AttributeName: aws.String("owner"),
+				AttributeName: aws.String("processed"),
 				AttributeType: aws.String("S"),
 			},
 			{
-				AttributeName: aws.String("processed"),
+				AttributeName: aws.String("original"),
 				AttributeType: aws.String("S"),
 			},
 		},
@@ -35,7 +34,7 @@ func createTableLinks(svc *dynamodb.DynamoDB) {
 				KeyType:       aws.String("HASH"),
 			},
 			{
-				AttributeName: aws.String("owner"),
+				AttributeName: aws.String("original"),
 				KeyType:       aws.String("RANGE"),
 			},
 		},
@@ -53,7 +52,7 @@ func createTableClicks(svc *dynamodb.DynamoDB) {
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
-				AttributeName: aws.String("owner"),
+				AttributeName: aws.String("processed"),
 				AttributeType: aws.String("S"),
 			},
 			{
@@ -63,7 +62,7 @@ func createTableClicks(svc *dynamodb.DynamoDB) {
 		},
 		KeySchema: []*dynamodb.KeySchemaElement{
 			{
-				AttributeName: aws.String("owner"),
+				AttributeName: aws.String("processed"),
 				KeyType:       aws.String("HASH"),
 			},
 			{
@@ -159,7 +158,7 @@ func main() {
 	fmt.Println("Starting configuration of data model")
 	config := &aws.Config{
 		Region:   aws.String("us-west-2"),
-		Endpoint: aws.String("http://localhost:" + os.Getenv("PORT")),
+		Endpoint: aws.String("http://localhost:" + os.Getenv("DYNAMO_PORT")),
 	}
 
 	sess := session.Must(session.NewSession(config))

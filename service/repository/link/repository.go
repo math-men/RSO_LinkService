@@ -1,7 +1,6 @@
 package link
 
 import (
-	"fmt"
 	"context"
 	"math/rand"
 	"time"
@@ -38,8 +37,6 @@ func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (string, 
 
   _, err = d.Conn.PutItem(input)
   if err != nil {
-		fmt.Println(err)
-
     return "", models.ErrInsert
   }
 
@@ -48,7 +45,6 @@ func (d *dynamodbLinkRepo) Create(ctx context.Context, l *models.Link) (string, 
 }
 
 func (d *dynamodbLinkRepo) Get(ctx context.Context, shortened string) ([]*models.Link, error) {
-	fmt.Println(shortened)
 	var queryInput = &dynamodb.QueryInput{
 	    TableName: aws.String("Links"),
 	    KeyConditions: map[string]*dynamodb.Condition{
@@ -64,7 +60,6 @@ func (d *dynamodbLinkRepo) Get(ctx context.Context, shortened string) ([]*models
 	}
 	var result, err = d.Conn.Query(queryInput)
 	if err != nil {
-			fmt.Println(err)
 	    return nil, models.ErrQuery
 	}
 
@@ -86,11 +81,9 @@ func (d *dynamodbLinkRepo) Fetch(ctx context.Context) ([]*models.Link, error) {
 		params := &dynamodb.ScanInput{
 			TableName: aws.String("Links"),
 		}
-		fmt.Println("query")
 
 		result, err := d.Conn.Scan(params)
 		if err != nil {
-			fmt.Println(err)
 			return nil, models.ErrQuery
 		}
 
