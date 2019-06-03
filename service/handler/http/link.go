@@ -103,5 +103,5 @@ func respondwithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 // respondwithError return error message
 func respondWithError(w http.ResponseWriter, code int, msg string) {
-	respondwithJSON(w, code, map[string]string{"error": msg})
+	respondwithJSON(w, code, map[string]string{"message": msg})
 }
