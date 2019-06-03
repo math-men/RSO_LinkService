@@ -24,6 +24,7 @@ func main() {
 
 	lHandler := lh.NewLinkHandler(connection)
   r.Get("/health", lHandler.Health)
+  r.Get("/{shortened:.*}", lHandler.Get)
 	r.Route("/", func(rt chi.Router) {
 		rt.Mount("/links", linkRouter(lHandler))
 	})
@@ -36,7 +37,6 @@ func linkRouter(lHandler *lh.Link) http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", lHandler.Create)
   r.Get("/", lHandler.Fetch)
-  r.Get("/{shortened:.*}", lHandler.Get)
   r.Get("/api/{shortened:.*}", lHandler.GetClicks)
 	return r
 }
